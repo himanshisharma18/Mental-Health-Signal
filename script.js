@@ -148,6 +148,23 @@
     };
   }
 
+  function toApiPayload(payload) {
+    return {
+      Age: payload.age,
+      Gender: payload.gender,
+      Country: payload.country,
+      Academic_Level: payload.academic_level,
+      Most_Used_Platform: payload.most_used_platform,
+      Purpose_Of_Use: payload.purpose_of_use,
+      Avg_Daily_Usage_Hours: payload.avg_daily_usage_hours,
+      Daily_Unlocks: payload.daily_unlocks,
+      Study_Hours: payload.study_hours,
+      Physical_Activity_Hours: payload.physical_activity_hours,
+      Sleep_Hours_Per_Night: payload.sleep_hours_per_night,
+      Stress_Level: payload.stress_level,
+    };
+  }
+
   // ---------------------------------------------------------
   // UI state switching
   // ---------------------------------------------------------
@@ -212,9 +229,24 @@
   // ---------------------------------------------------------
   function applyServerValidationErrors(detail) {
     if (!Array.isArray(detail)) return false;
+    const apiToFormField = {
+      Age: "age",
+      Gender: "gender",
+      Country: "country",
+      Academic_Level: "academic_level",
+      Most_Used_Platform: "most_used_platform",
+      Purpose_Of_Use: "purpose_of_use",
+      Avg_Daily_Usage_Hours: "avg_daily_usage_hours",
+      Daily_Unlocks: "daily_unlocks",
+      Study_Hours: "study_hours",
+      Physical_Activity_Hours: "physical_activity_hours",
+      Sleep_Hours_Per_Night: "sleep_hours_per_night",
+      Stress_Level: "stress_level",
+    };
     let matched = false;
     detail.forEach((err) => {
-      const field = Array.isArray(err.loc) ? err.loc[err.loc.length - 1] : null;
+      const apiField = Array.isArray(err.loc) ? err.loc[err.loc.length - 1] : null;
+      const field = apiToFormField[apiField] || apiField;
       const input = field ? document.getElementById(field) : null;
       const target = field === "stress_level" ? stressHiddenInput : input;
       if (target) {
@@ -245,10 +277,11 @@
     showState("loading");
 
     try {
+      const apiPayload = toApiPayload(payload);
       const res = await fetch(`${API_BASE}/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(apiPayload),
       });
 
       if (res.status === 422) {
