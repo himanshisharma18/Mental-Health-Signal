@@ -2,12 +2,21 @@ import joblib
 import pandas as pd
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel,Field
 from typing import Literal
 
 model = joblib.load("Mental_Health_model.pkl")
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://mental-health-signal-1-gm47.onrender.com"],
+    allow_credentials=False,
+    allow_methods=["POST"],
+    allow_headers=["Content-Type"],
+)
 
 
 class StudentData(BaseModel):
